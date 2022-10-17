@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
         try {
             return repository.save(user);
         } catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("Email используется");
+            throw new ExistsElementException("Email используется");
         }
     }
 

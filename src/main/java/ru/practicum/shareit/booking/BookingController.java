@@ -55,12 +55,18 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> findAllByUserId(
             @RequestHeader(USER_ID_HEADER) long userId,
-            @RequestParam(defaultValue = "ALL", required = false) BookingState state
+            @RequestParam(defaultValue = "ALL", required = false) String state
 
     ) {
+        BookingState stater;
+        try {
+            stater = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Unknown state:" + state);
+        }
         //Типа валидация:)
         User owner = userService.getById(userId);
-        return bookingService.findAllByUserId(userId, state).stream()
+        return bookingService.findAllByUserId(userId, stater).stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
@@ -68,11 +74,17 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDto> findAllByOwnerId(
             @RequestHeader(USER_ID_HEADER) long ownerId,
-            @RequestParam(defaultValue = "ALL", required = false) BookingState state
+            @RequestParam(defaultValue = "ALL", required = false) String state
             //
     ) {
+        BookingState stater;
+        try {
+            stater = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Unknown state:" + state);
+        }
         User owner = userService.getById(ownerId);
-        return bookingService.findAllByOwnerId(ownerId, state).stream()
+        return bookingService.findAllByOwnerId(ownerId, stater).stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
