@@ -1,72 +1,95 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.ItemMapper;
+import ru.practicum.shareit.item.model.*;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * TODO Sprint add-controllers.
- */
+import static ru.practicum.shareit.Constant.USER_ID_HEADER;
+
+
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
-    public static final String USER_ID_HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
     private final UserService userService;
-    private final ItemMapper itemMapper;
+    private final BookingService bookingService;
 
     @PostMapping
     public ItemDto create(
-            @RequestHeader(USER_ID_HEADER) int userId,
-            @RequestBody ItemDto itemDto
+            @RequestHeader(USER_ID_HEADER) long userId,
+            @Valid @RequestBody ItemDto itemDto
     ) {
-        userService.getById(userId);
-        Item item = itemMapper.toItem(itemDto, userId);
-        Item itemSaved = itemService.create(item);
-        return itemMapper.toItemDto(itemSaved);
+        User user = userService.getById(userId);
+        Item item = ItemMapper.toItem(user, itemDto);
+        Item itemSaved = itemService.create(userId, item);
+        return ItemMapper.toItemDto(itemSaved);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto update(
-            @RequestHeader(USER_ID_HEADER) int userId,
-            @PathVariable int itemId,
+            @RequestHeader(USER_ID_HEADER) long userId,
+            @PathVariable long itemId,
             @RequestBody ItemDto itemDto
     ) {
-        Item itemValid = itemService.getById(itemId);
-        if (itemValid.getOwner() != userId) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Вещь не пренадлежит владельцу");
-        }
-        Item item = itemMapper.toItem(itemDto, userId);
-        Item itemUpdated = itemService.update(itemId, item);
-        return itemMapper.toItemDto(itemUpdated);
+        User user = userService.getById(userId);
+        Item item = ItemMapper.toItem(user, itemDto);
+        Item itemUpdated = itemService.update(userId, itemId, item);
+        return ItemMapper.toItemDto(itemUpdated);
     }
 
     @GetMapping("/{id}")
-    public ItemDto getById(@PathVariable int id) {
-        return itemMapper.toItemDto(itemService.getById(id));
+    public ItemDtoWithBooking getById(@RequestHeader(USER_ID_HEADER) long userId, @PathVariable long id) {
+        Item item = itemService.getById(id);
+        List<Comment> commentList = itemService.findCommentsByItemId(id);
+        if (item.getOwner().getId().equals(userId)) {
+            Booking lastBooking = bookingService.findLastBookingByItemId(id);
+            Booking nextBooking = bookingService.findNextBookingByItemId(id);
+            return ItemMapper.toItemDtoWithBooking(commentList, lastBooking, nextBooking, item);
+        } else {
+            return ItemMapper.toItemDtoWithBooking(commentList, null, null, item);
+        }
     }
 
     @GetMapping
-    public List<ItemDto> getAllByUser(@RequestHeader(USER_ID_HEADER) int userId) {
+    public List<ItemDtoWithBooking> getAllByUser(@RequestHeader(USER_ID_HEADER) long userId) {
         return itemService.getAllByUser(userId).stream()
-                .map(itemMapper::toItemDto)
+                .map(item -> {
+                    List<Comment> commentList = itemService.findCommentsByItemId(item.getId());
+                    Booking lastBooking = bookingService.findLastBookingByItemId(item.getId());
+                    Booking nextBooking = bookingService.findNextBookingByItemId(item.getId());
+                    return ItemMapper.toItemDtoWithBooking(commentList, lastBooking, nextBooking, item);
+                })
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchByText(@RequestParam String text) {
         return itemService.searchByText(text).stream()
-                .map(itemMapper::toItemDto)
+                .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addCommentToItem(
+            @RequestBody CommentDto commentDto,
+            @PathVariable long itemId,
+            @RequestHeader(USER_ID_HEADER) long userId
+    ) {
+        User author = userService.getById(userId);
+        Item item = itemService.getById(itemId);
+        Comment comment = CommentMapper.toComment(author, item, commentDto);
+        return CommentMapper.toCommentDto(itemService.addCommentToItem(comment));
     }
 }
