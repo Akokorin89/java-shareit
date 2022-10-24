@@ -1,17 +1,15 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "items")
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @ToString
@@ -20,15 +18,12 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     @Column(nullable = false)
     private String name;
 
-    @NotBlank
     @Column(nullable = false)
     private String description;
 
-    @NotNull
     @Column(nullable = false)
     private Boolean available;
 
