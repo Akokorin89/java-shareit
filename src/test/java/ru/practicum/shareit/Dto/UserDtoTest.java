@@ -19,9 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JsonTest
 public class UserDtoTest {
 
-    private JacksonTester<UserDto> json;
+    private final JacksonTester<UserDto> json;
     private UserDto userDto;
-    private Validator validator;
+    private final Validator validator;
 
     public UserDtoTest(@Autowired JacksonTester<UserDto> json) {
         this.json = json;
@@ -83,7 +83,6 @@ public class UserDtoTest {
         userDto.setEmail("alex.alex");
         Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
         assertThat(violations).isNotEmpty();
-        System.out.println(violations.toString());
         assertThat(violations.toString()).contains("interpolatedMessage='должно иметь формат адреса электронной почты'");
     }
 
