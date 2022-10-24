@@ -34,9 +34,9 @@ public class UserServiceIntegrationTest {
     @Test
     public void shouldUpdate() {
         User user = userService.create(new User(null, "Name", "test@test.ru"));
-        userService.update(user.getId(), new User(1L, "updateUser", "mail@test.ru"));
+        userService.update(user.getId(), new User(null, "updateUser", "mail@test.ru"));
         User updateUser = userService.getById(user.getId());
-        Assertions.assertEquals(1, updateUser.getId());
+        Assertions.assertEquals(user.getId(), updateUser.getId());
         Assertions.assertEquals("updateUser", updateUser.getName());
         Assertions.assertEquals("mail@test.ru", updateUser.getEmail());
     }

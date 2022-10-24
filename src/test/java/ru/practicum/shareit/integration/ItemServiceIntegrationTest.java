@@ -43,7 +43,6 @@ public class ItemServiceIntegrationTest {
                 user, null));
         Item itemUpdate = itemService.update(user.getId(), item.getId(), new Item(1L, "Клей 2", "Суперклей",
                 true, user, null));
-        Assertions.assertEquals(1, itemUpdate.getId());
         Assertions.assertEquals("Клей 2", itemUpdate.getName());
         Assertions.assertEquals("Суперклей", itemUpdate.getDescription());
     }
