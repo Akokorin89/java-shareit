@@ -1,16 +1,16 @@
 package ru.practicum.shareit.request;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "item_requests")
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @ToString
@@ -27,5 +27,5 @@ public class ItemRequest {
     @JoinColumn(name = "requester_id")
     private User requester;
 
-    private LocalDate created;
+    private LocalDateTime created;
 }

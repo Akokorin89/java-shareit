@@ -13,9 +13,11 @@ public interface ItemService {
 
     Item getById(long id);
 
-    List<Item> getAllByUser(long userId);
+    List<Item> getAllByUser(long userId, int from, int size);
 
-    List<Item> searchByText(String text);
+    List<Item> findByRequestId(long requestId);
+
+    List<Item> searchByText(String text, int from, int size);
 
     Comment addCommentToItem(Comment comment);
 
