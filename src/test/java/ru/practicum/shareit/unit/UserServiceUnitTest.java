@@ -51,4 +51,5 @@ class UserServiceUnitTest {
         Exception thrown = assertThrows(ExistsElementException.class, () -> userService.update(1L, updateUser));
         assertEquals("Электронная почта существует", thrown.getMessage());
     }
+
 }

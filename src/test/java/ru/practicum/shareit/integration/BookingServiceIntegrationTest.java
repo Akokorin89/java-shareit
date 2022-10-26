@@ -36,18 +36,48 @@ public class BookingServiceIntegrationTest {
                 "Секундный клей момент", true, user, null));
         Item item3 = itemService.create(user.getId(), new Item(null, "Клей 3",
                 "Секундный клей момент", true, user, null));
-        bookingService.create(someUser.getId(), new Booking(null, LocalDateTime.now().plusDays(1),
+        Booking booking1 = bookingService.create(someUser.getId(), new Booking(null, LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(2), item, someUser, BookingStatus.WAITING)
         );
-        bookingService.create(someUser.getId(), new Booking(null, LocalDateTime.now().plusDays(1),
+        Booking booking2 = bookingService.create(someUser.getId(), new Booking(null, LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(2), item2, someUser, BookingStatus.WAITING)
         );
-        bookingService.create(someUser.getId(), new Booking(null, LocalDateTime.now().plusDays(1),
+        Booking booking3 = bookingService.create(someUser.getId(), new Booking(null, LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(2), item3, someUser, BookingStatus.WAITING)
         );
         List<Booking> bookings = bookingService.findAllByOwnerId(user.getId(), BookingState.ALL, 0, 10);
         Assertions.assertEquals(3, bookings.size());
+        List<Booking> bookingsFuture = bookingService.findAllByOwnerId(user.getId(), BookingState.FUTURE, 0, 10);
+        Assertions.assertEquals(3, bookingsFuture.size());
         bookings = bookingService.findAllByUserId(someUser.getId(), BookingState.ALL, 0, 10);
         Assertions.assertEquals(3, bookings.size());
+        bookings = bookingService.findAllByUserId(someUser.getId(), BookingState.FUTURE, 0, 10);
+        Assertions.assertEquals(3, bookings.size());
+
+        booking1.setStatus(BookingStatus.REJECTED);
+        booking2.setStatus(BookingStatus.APPROVED);
+        booking3.setStatus(BookingStatus.CANCELED);
+
+        List<Booking> bookingRejected = bookingService.findAllByUserId(someUser.getId(), BookingState.REJECTED, 0, 10);
+        Assertions.assertEquals(1,bookingRejected.size());
+        List<Booking> bookingApproved = bookingService.findAllByUserId(someUser.getId(), BookingState.WAITING, 0, 10);
+        Assertions.assertEquals(0,bookingApproved.size());
+        List<Booking> bookingCurrent = bookingService.findAllByUserId(someUser.getId(), BookingState.CURRENT, 0, 10);
+        Assertions.assertEquals(0,bookingCurrent.size());
+        booking1.setStart(LocalDateTime.now().minusDays(10));
+        booking1.setEnd(LocalDateTime.now().minusDays(8));
+        List<Booking> bookingPast = bookingService.findAllByUserId(someUser.getId(), BookingState.PAST, 0, 10);
+        Assertions.assertEquals(1,bookingPast.size());
+
+
+        List<Booking> bookingRejectedOwner = bookingService.findAllByOwnerId(user.getId(), BookingState.REJECTED, 0, 10);
+        Assertions.assertEquals(1,bookingRejectedOwner.size());
+        List<Booking> bookingWaitingOwner = bookingService.findAllByOwnerId(user.getId(), BookingState.WAITING, 0, 10);
+        Assertions.assertEquals(0,bookingWaitingOwner.size());
+        List<Booking> bookingCurrentOwner = bookingService.findAllByOwnerId(user.getId(), BookingState.CURRENT, 0, 10);
+        Assertions.assertEquals(0,bookingCurrentOwner.size());
+        List<Booking> bookingPastOwner = bookingService.findAllByOwnerId(user.getId(), BookingState.PAST, 0, 10);
+        Assertions.assertEquals(1,bookingPastOwner.size());
+
     }
 }

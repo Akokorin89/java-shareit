@@ -123,34 +123,38 @@ public class BookingServiceImpl implements BookingService {
     public List<Booking> findAllByOwnerId(long ownerId, BookingState state, int from, int size) {
         List<Booking> bookingList = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
-        Pageable pageable = PageRequest.of(from, size);
-        switch (state) {
-            case ALL:
-                bookingList = bookingRepository.findByItem_Owner_IdOrderByIdDesc(ownerId, pageable);
-                break;
-            case PAST:
-                bookingList = bookingRepository.findByItem_Owner_IdAndEndBefore(ownerId, now, pageable);
-                break;
-            case CURRENT:
-                bookingList = bookingRepository.findByItem_Owner_IdAndStartBeforeAndEndAfter(ownerId, now, now,
-                        pageable);
-                break;
-            case FUTURE:
-                bookingList = bookingRepository.findByItem_Owner_IdAndStartAfterOrderByStartDesc(ownerId, now,
-                        pageable);
-                break;
-            case WAITING:
-                bookingList = bookingRepository.findByItem_Owner_IdAndStatus(ownerId, BookingStatus.WAITING,
-                        pageable);
-                break;
-            case REJECTED:
-                bookingList = bookingRepository.findByItem_Owner_IdAndStatus(ownerId, BookingStatus.REJECTED,
-                        pageable);
-                break;
-        }
-        if (bookingList.isEmpty())
-            throw new NoSuchElementException("Bookings not found");
-        return bookingList;
+        if (from >= 0 && size >= 0) {
+            int fromPage = from / size;
+            Pageable pageable = PageRequest.of(fromPage, size);
+            switch (state) {
+                case ALL:
+                    bookingList = bookingRepository.findByItem_Owner_IdOrderByIdDesc(ownerId, pageable);
+                    break;
+                case PAST:
+                    bookingList = bookingRepository.findByItem_Owner_IdAndEndBefore(ownerId, now, pageable);
+                    break;
+                case CURRENT:
+                    bookingList = bookingRepository.findByItem_Owner_IdAndStartBeforeAndEndAfter(ownerId, now, now,
+                            pageable);
+                    break;
+                case FUTURE:
+                    bookingList = bookingRepository.findByItem_Owner_IdAndStartAfterOrderByStartDesc(ownerId, now,
+                            pageable);
+                    break;
+                case WAITING:
+                    bookingList = bookingRepository.findByItem_Owner_IdAndStatus(ownerId, BookingStatus.WAITING,
+                            pageable);
+                    break;
+                case REJECTED:
+                    bookingList = bookingRepository.findByItem_Owner_IdAndStatus(ownerId, BookingStatus.REJECTED,
+                            pageable);
+                    break;
+            }
+        } else {
+                throw new ValidateExeption("Bookings not found");
+            }
+            return bookingList;
+
     }
 
     @Override

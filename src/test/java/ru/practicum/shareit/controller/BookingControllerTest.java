@@ -44,7 +44,6 @@ class BookingControllerTest {
     private final Booking bookingRejected = new Booking(3L, start, end, item, someUser, BookingStatus.REJECTED);
     private final BookingDto bookingRejectedDto = BookingMapper.toBookingDto(bookingRejected);
 
-
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -180,4 +179,5 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$[2].booker.id", is(bookingRejectedDto.getBooker().getId()), Long.class))
                 .andExpect(jsonPath("$[2].status", is(bookingRejectedDto.getStatus().toString())));
     }
+
 }

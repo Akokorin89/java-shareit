@@ -83,6 +83,7 @@ public class BookingController {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Unknown state:" + state);
         }
+        User owner = userService.getById(ownerId);
         return bookingService.findAllByOwnerId(ownerId, stater, from, size).stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
