@@ -70,6 +70,7 @@ public class BookingServiceIntegrationTest {
         Assertions.assertEquals(1,bookingPast.size());
 
 
+
         List<Booking> bookingRejectedOwner = bookingService.findAllByOwnerId(user.getId(), BookingState.REJECTED, 0, 10);
         Assertions.assertEquals(1,bookingRejectedOwner.size());
         List<Booking> bookingWaitingOwner = bookingService.findAllByOwnerId(user.getId(), BookingState.WAITING, 0, 10);

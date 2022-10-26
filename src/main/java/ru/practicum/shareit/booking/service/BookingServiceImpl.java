@@ -110,8 +110,6 @@ public class BookingServiceImpl implements BookingService {
                 case REJECTED:
                     bookingList = bookingRepository.findByBooker_IdAndStatus(userId, BookingStatus.REJECTED, pageable);
                     break;
-                default:
-                    throw new ValidateExeption("Bookings not found");
             }
         } else {
             throw new ValidateExeption("Bookings not found");
@@ -151,9 +149,9 @@ public class BookingServiceImpl implements BookingService {
                     break;
             }
         } else {
-                throw new ValidateExeption("Bookings not found");
-            }
-            return bookingList;
+            throw new ValidateExeption("Bookings not found");
+        }
+        return bookingList;
 
     }
 
@@ -179,7 +177,5 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidateExeption("Start in past");
         if (booking.getEnd().isBefore(booking.getStart()))
             throw new ValidateExeption("End before start");
-        if (booking.getEnd().isBefore(LocalDateTime.now()))
-            throw new ValidateExeption("End in past");
     }
 }

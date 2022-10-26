@@ -102,6 +102,27 @@ class BookingServiceUnitTest {
     }
 
     @Test
+    public void shouldExceptionGetByIdEndUserId() {
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+        Exception thrown = assertThrows(NoSuchElementException.class, () ->
+                bookingService.getByIdEndUserId(1, 2));
+        assertEquals("Бронирование не найдено", thrown.getMessage());
+
+    }
+
+    @Test
+    public void shouldExceptionUserNotFoundGetByIdEndUserId() {
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(booking));
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+        Exception thrown = assertThrows(NoSuchElementException.class, () ->
+                bookingService.getByIdEndUserId(1, 2));
+        assertEquals("Пользователь не найден", thrown.getMessage());
+    }
+
+    @Test
     public void shouldExceptionUserNotFound() {
         when(bookingRepository.findById(anyLong()))
                 .thenReturn(Optional.of(booking));
@@ -145,6 +166,10 @@ class BookingServiceUnitTest {
         Exception thrown = assertThrows(ValidateExeption.class, () ->
                 bookingService.approveBooking(1, 2, true));
         assertEquals("Статус бронирования уже одобрен", thrown.getMessage());
+        bookingApproved.setStatus(BookingStatus.APPROVED);
+        Exception thrownExcept = assertThrows(ValidateExeption.class, () ->
+                bookingService.approveBooking(1, 2, true));
+        assertEquals("Статус бронирования уже одобрен", thrownExcept.getMessage());
     }
 
     @Test
@@ -158,9 +183,54 @@ class BookingServiceUnitTest {
         Exception thrown = assertThrows(ValidateExeption.class, () ->
                 bookingService.approveBooking(1, 2, false));
         assertEquals("Статус бронирования уже отклонен", thrown.getMessage());
+        bookingRejected.setStatus(BookingStatus.WAITING);
+        bookingRejected.setStatus(BookingStatus.REJECTED);
+        Exception thrownExcept = assertThrows(ValidateExeption.class, () ->
+                bookingService.approveBooking(1, 2, false));
+        assertEquals("Статус бронирования уже отклонен", thrownExcept.getMessage());
     }
 
+    @Test
+    public void shouldExceptionСreate() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+        Exception thrown = assertThrows(NoSuchElementException.class, () ->
+                bookingService.create(1, booking));
+        assertEquals("User not found", thrown.getMessage());
+    }
 
+    @Test
+    public void shouldExceptionCreateItem() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(someUser));
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+        Exception thrown = assertThrows(NoSuchElementException.class, () ->
+                bookingService.create(1, booking));
+        assertEquals("Item not found", thrown.getMessage());
+    }
 
+    @Test
+    public void shouldExceptionGetById() {
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(booking));
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+        Exception thrown = assertThrows(NoSuchElementException.class, () ->
+                bookingService.getByIdEndUserId(1, 1));
+        assertEquals("Пользователь не найден", thrown.getMessage());
+    }
+
+    @Test
+    public void shouldGetByIdEndUserId() {
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(booking));
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(someUser));
+        Booking bookingTest = bookingService.getByIdEndUserId(1, 2);
+        assertEquals(booking, bookingTest);
+        assertEquals(2, booking.getBooker().getId());
+        assertEquals(1, booking.getItem().getOwner().getId());
+    }
 
 }

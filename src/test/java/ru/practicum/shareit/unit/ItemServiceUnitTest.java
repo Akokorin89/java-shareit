@@ -86,4 +86,14 @@ class ItemServiceUnitTest {
         assertEquals("User not booking its item", thrown.getMessage());
     }
 
+    @Test
+    public void shouldValidateExceptionItemCreate() {
+        Mockito
+                .when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.empty());
+
+        Exception thrown = assertThrows(NoSuchElementException.class, () -> itemService.create(1,item));
+        assertEquals("Пользователь не найден", thrown.getMessage());
+    }
+
 }

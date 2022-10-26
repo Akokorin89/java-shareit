@@ -20,16 +20,16 @@ public class BookingDtoTest {
 
     @Test
     void testBookingDto() throws Exception {
-        // Given
+
         BookingDto bookingDto = new BookingDto();
         bookingDto.setId(1L);
         bookingDto.setStart(LocalDateTime.now().plusDays(1));
         bookingDto.setEnd(LocalDateTime.now().plusDays(2));
         bookingDto.setStatus(BookingStatus.APPROVED);
         bookingDto.setItem(new BookingDto.Item(2L, "test"));
-        // When
+
         JsonContent<BookingDto> result = json.write(bookingDto);
-        // Then
+
         assertThat(result).hasJsonPathStringValue("$.start");
         assertThat(result).hasJsonPathStringValue("$.end");
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
