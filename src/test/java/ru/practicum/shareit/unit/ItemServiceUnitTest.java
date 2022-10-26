@@ -74,7 +74,7 @@ class ItemServiceUnitTest {
     }
 
     @Test
-    void shouldValidateExceptionIsUserNotBookingItem() {
+    public void shouldValidateExceptionIsUserNotBookingItem() {
         Mockito
                 .when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(someUser));
@@ -85,4 +85,5 @@ class ItemServiceUnitTest {
         Exception thrown = assertThrows(ValidateExeption.class, () -> itemService.addCommentToItem(comment));
         assertEquals("User not booking its item", thrown.getMessage());
     }
+
 }

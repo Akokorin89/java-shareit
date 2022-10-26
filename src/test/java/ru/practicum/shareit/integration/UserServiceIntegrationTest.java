@@ -49,5 +49,4 @@ public class UserServiceIntegrationTest {
         assertFalse(userService.getAll().contains(user.getId()));
 
     }
-
 }
