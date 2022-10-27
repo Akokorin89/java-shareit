@@ -62,7 +62,6 @@ public class ItemServiceImpl implements ItemService {
     public Comment addCommentToItem(Comment comment) {
         User user = userRepository.findById(comment.getAuthor().getId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
-        ;
         itemRepository.findById(comment.getItem().getId());
         //Check comment
         if (comment.getText() == null || comment.getText().isBlank())
