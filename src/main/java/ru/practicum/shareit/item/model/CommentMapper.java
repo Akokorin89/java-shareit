@@ -13,7 +13,13 @@ public class CommentMapper {
                 .build();
     }
 
-    public static Comment toComment(User author, Item item, CommentDto commentDto) {
+    public static Comment toComment(Long authorId, Long itemId, CommentDto commentDto) {
+        User author = new User();
+        if (authorId != null)
+            author.setId(authorId);
+        Item item = new Item();
+        if (itemId != null)
+            item.setId(itemId);
         Comment comment = new Comment();
         comment.setId(commentDto.getId());
         comment.setText(commentDto.getText());
