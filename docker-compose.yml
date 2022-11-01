@@ -1,28 +1,35 @@
 version: '3.8'
 services:
   gateway:
-    build:
-    image:
-    container_name:
+    build: ./gateway
+    container_name: gateway
     ports:
       - "8080:8080"
     depends_on:
+      - server
     environment:
       - SHAREIT_SERVER_URL=http://server:9090
 
   server:
-    build:
-    image:
-    container_name:
+    build: ./server
+    container_name: server
     ports:
       - "9090:9090"
     depends_on:
+      - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
+      - SPRING_DATASOURCE_USERNAME=practicum
+      - SPRING_DATASOURCE_PASSWORD=practicum
 
   db:
-    image:
-    container_name:
+    image: postgres:14.5-1
+    container_name: db
+    volumes:
+      - /var/lib/postgresql/data/
     ports:
       - "6541:5432"
     environment:
+      - POSTGRES_DB=shareit
+      - POSTGRES_USER=practicum
+      - POSTGRES_PASSWORD=practicum
